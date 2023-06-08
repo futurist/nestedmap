@@ -59,7 +59,8 @@ func Example() {
 	// Serialized JSON: {"A":{"B":{"C":{"D":"old_value","E":{"XX":{"X":"xyz","Y":"abc"}}}}}}
 }
 
-func ExampleInReadme() {
+// ExampleMarshal the example in README.md
+func ExampleMarshal() {
 	input := `
 	{
 		"A": {
