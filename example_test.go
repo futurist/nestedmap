@@ -1,0 +1,52 @@
+package nestedmap
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+func Example() {
+	input := `
+	{
+		"A": {
+			"B": {
+				"C": {
+					"D": "old_value"
+				}
+			}
+		}
+	}`
+
+	var nestedMap NestedMap
+	err := json.Unmarshal([]byte(input), &nestedMap)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	value := nestedMap.GetValue(`[A][B][C][D]`)
+	if value != nil {
+		fmt.Println("Value at path [A][B][C][D]:", value)
+	} else {
+		fmt.Println("Path not found")
+	}
+
+	value = nestedMap.GetValue(`[A][B][C][DD]`)
+	fmt.Println("Value at [A][B][C][DD]:", value)
+
+	newNestedMap := NestedMap{
+		Data: map[string]interface{}{
+			"X": "xyz",
+			"Y": "abc",
+		},
+	}
+
+	nestedMap.SetValue(`[A][B][C][E][XX]`, &newNestedMap)
+	value = nestedMap.GetValue(`[A][B][C][E][XX][X]`)
+	fmt.Println("Value at path [A][B][C][E][XX][X]:", value)
+
+	// Output:
+	// Value at path [A][B][C][D]: old_value
+	// Value at [A][B][C][DD]: <nil>
+	// Value at path [A][B][C][E][XX][X]: xyz
+}
