@@ -48,7 +48,7 @@ func (n NestedMap) GetValue(path string) interface{} {
 		return nil
 	}
 
-	value, found := n.getValue_helper(keys, 0)
+	value, found := n.getValueHelper(keys, 0)
 	if !found {
 		return nil
 	}
@@ -64,11 +64,11 @@ func (n NestedMap) SetValue(path string, value interface{}) {
 		return
 	}
 
-	n.setValue_helper(keys, 0, value)
+	n.setValueHelper(keys, 0, value)
 }
 
-// getValue_helper is a helper function to search for the value at the specified path.
-func (n NestedMap) getValue_helper(keys []string, index int) (interface{}, bool) {
+// getValueHelper is a helper function to search for the value at the specified path.
+func (n NestedMap) getValueHelper(keys []string, index int) (interface{}, bool) {
 	if index >= len(keys) {
 		return nil, false
 	}
@@ -83,14 +83,14 @@ func (n NestedMap) getValue_helper(keys []string, index int) (interface{}, bool)
 	}
 
 	if nestedMap, ok := value.(*NestedMap); ok {
-		return nestedMap.getValue_helper(keys, index+1)
+		return nestedMap.getValueHelper(keys, index+1)
 	}
 
 	return nil, false
 }
 
-// setValue_helper is a helper function to set the value at the specified path.
-func (n NestedMap) setValue_helper(keys []string, index int, value interface{}) {
+// setValueHelper is a helper function to set the value at the specified path.
+func (n NestedMap) setValueHelper(keys []string, index int, value interface{}) {
 	if index >= len(keys) {
 		return
 	}
@@ -101,13 +101,13 @@ func (n NestedMap) setValue_helper(keys []string, index int, value interface{}) 
 	}
 
 	if currentValue, ok := n.Data[keys[index]].(*NestedMap); ok {
-		currentValue.setValue_helper(keys, index+1, value)
+		currentValue.setValueHelper(keys, index+1, value)
 	} else {
 		newMap := &NestedMap{
 			Data: make(map[string]interface{}),
 		}
 		n.Data[keys[index]] = newMap
-		newMap.setValue_helper(keys, index+1, value)
+		newMap.setValueHelper(keys, index+1, value)
 	}
 }
 
