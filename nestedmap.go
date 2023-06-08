@@ -40,9 +40,30 @@ func (n *NestedMap) fixNestedMaps(m map[string]interface{}) {
 	}
 }
 
+// MarshalJSON is a custom marshaller for NestedMap that
+// serializes the NestedMap without exposing the `Data` structure.
+func (n *NestedMap) MarshalJSON() ([]byte, error) {
+	processedMap := n.processMap(n.Data)
+	return json.Marshal(processedMap)
+}
+
+// processMap recursively converts NestedMap values to regular maps,
+// excluding the `Data` structure, and returns the result as a map[string]interface{}.
+func (n *NestedMap) processMap(m map[string]interface{}) map[string]interface{} {
+	res := make(map[string]interface{}, len(m))
+	for key, value := range m {
+		if nestedMap, ok := value.(*NestedMap); ok {
+			res[key] = n.processMap(nestedMap.Data)
+		} else {
+			res[key] = value
+		}
+	}
+	return res
+}
+
 // GetValue returns the value at the specified path in the NestedMap.
 // If the value is not found at the specified path, it returns nil.
-func (n NestedMap) GetValue(path string) interface{} {
+func (n *NestedMap) GetValue(path string) interface{} {
 	keys := parsePath(path)
 	if keys == nil {
 		return nil
@@ -58,7 +79,7 @@ func (n NestedMap) GetValue(path string) interface{} {
 
 // SetValue sets the value at the specified path in the NestedMap.
 // It will create new NestedMaps along the path if they don't exist.
-func (n NestedMap) SetValue(path string, value interface{}) {
+func (n *NestedMap) SetValue(path string, value interface{}) {
 	keys := parsePath(path)
 	if keys == nil {
 		return
@@ -68,7 +89,7 @@ func (n NestedMap) SetValue(path string, value interface{}) {
 }
 
 // getValueHelper is a helper function to search for the value at the specified path.
-func (n NestedMap) getValueHelper(keys []string, index int) (interface{}, bool) {
+func (n *NestedMap) getValueHelper(keys []string, index int) (interface{}, bool) {
 	if index >= len(keys) {
 		return nil, false
 	}
@@ -90,7 +111,7 @@ func (n NestedMap) getValueHelper(keys []string, index int) (interface{}, bool) 
 }
 
 // setValueHelper is a helper function to set the value at the specified path.
-func (n NestedMap) setValueHelper(keys []string, index int, value interface{}) {
+func (n *NestedMap) setValueHelper(keys []string, index int, value interface{}) {
 	if index >= len(keys) {
 		return
 	}

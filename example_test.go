@@ -45,8 +45,16 @@ func Example() {
 	value = nestedMap.GetValue(`[A][B][C][E][XX][X]`)
 	fmt.Println("Value at path [A][B][C][E][XX][X]:", value)
 
+	serialized, err := json.Marshal(nestedMap.Data)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	fmt.Println("Serialized JSON:", string(serialized))
+
 	// Output:
 	// Value at path [A][B][C][D]: old_value
 	// Value at [A][B][C][DD]: <nil>
 	// Value at path [A][B][C][E][XX][X]: xyz
+	// Serialized JSON: {"A":{"B":{"C":{"D":"old_value","E":{"XX":{"X":"xyz","Y":"abc"}}}}}}
 }
