@@ -86,3 +86,34 @@ func ExampleMarshal() {
 	// true
 	// {"A":{"B":{"C":{"D":"value","E":"OK"}}}}
 }
+
+func ExampleNew() {
+	nestedMap := New()
+	nestedMap1 := &NestedMap{
+		Data: make(map[string]interface{}),
+	}
+	nestedMap2 := &NestedMap{
+		Data: make(map[string]interface{}),
+	}
+
+	_ = nestedMap1.SetValue("[A][B]", "value1")
+	_ = nestedMap2.SetValue("[X][Y]", "value2")
+
+	// Create an array of NestedMap with nestedMap1 and nestedMap2.
+	nestedMaps := []*NestedMap{nestedMap1, nestedMap2}
+	_ = nestedMap.SetValue("[U]", nestedMaps) // sets the "U" key to the nestedMaps slice
+
+	fmt.Printf("Value at [U][0][A][B]: %v\n", nestedMap.GetValue("[U][0][A][B]"))
+	fmt.Printf("Value at [U][1][X][Y]: %v\n", nestedMap.GetValue("[U][1][X][Y]"))
+
+	serialized, err := json.Marshal(nestedMap)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	fmt.Println("Serialized JSON:", string(serialized))
+	// Output:
+	// Value at [U][0][A][B]: value1
+	// Value at [U][1][X][Y]: value2
+	// Serialized JSON: {"U":[{"A":{"B":"value1"}},{"X":{"Y":"value2"}}]}
+}

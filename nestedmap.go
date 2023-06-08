@@ -6,11 +6,18 @@ package nestedmap
 import (
 	"encoding/json"
 	"regexp"
+	"strconv"
 )
 
 // NestedMap is a data structure that represents a map with nested keys as a tree structure.
 type NestedMap struct {
 	Data map[string]interface{}
+}
+
+func New() *NestedMap {
+	return &NestedMap{
+		Data: make(map[string]interface{}),
+	}
 }
 
 // UnmarshalJSON is a custom unmarshaller for NestedMap that translates the JSON object
@@ -52,11 +59,23 @@ func (n *NestedMap) MarshalJSON() ([]byte, error) {
 func (n *NestedMap) processMap(m map[string]interface{}) map[string]interface{} {
 	res := make(map[string]interface{}, len(m))
 	for key, value := range m {
-		if nestedMap, ok := value.(*NestedMap); ok {
-			res[key] = n.processMap(nestedMap.Data)
-		} else {
+		switch v := value.(type) {
+		case *NestedMap:
+			res[key] = n.processMap(v.Data)
+		case []*NestedMap:
+			res[key] = n.processSlice(v)
+		default:
 			res[key] = value
 		}
+	}
+	return res
+}
+
+// processSlice processes a slice of NestedMap to handle serialization.
+func (n *NestedMap) processSlice(nestedMaps []*NestedMap) []interface{} {
+	res := make([]interface{}, len(nestedMaps))
+	for i, nm := range nestedMaps {
+		res[i] = n.processMap(nm.Data)
 	}
 	return res
 }
@@ -104,11 +123,18 @@ func (n *NestedMap) getValueHelper(keys []string, index int) (interface{}, bool)
 		return value, true
 	}
 
-	if nestedMap, ok := value.(*NestedMap); ok {
-		return nestedMap.getValueHelper(keys, index+1)
+	switch v := value.(type) {
+	case *NestedMap:
+		return v.getValueHelper(keys, index+1)
+	case []*NestedMap:
+		indexInSlice, err := strconv.Atoi(keys[index+1])
+		if err != nil || indexInSlice >= len(v) {
+			return nil, false
+		}
+		return v[indexInSlice].getValueHelper(keys, index+2)
+	default:
+		return nil, false
 	}
-
-	return nil, false
 }
 
 // setValueHelper is a helper function to set the value at the specified path.
@@ -127,9 +153,7 @@ func (n *NestedMap) setValueHelper(keys []string, index int, value interface{}) 
 		return currentValue.setValueHelper(keys, index+1, value)
 	}
 
-	newMap := &NestedMap{
-		Data: make(map[string]interface{}),
-	}
+	newMap := New()
 	n.Data[keys[index]] = newMap
 	return newMap.setValueHelper(keys, index+1, value)
 }
