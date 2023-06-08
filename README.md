@@ -33,10 +33,16 @@ input := `
 	}`
 
 var nestedMap NestedMap
-_ := json.Unmarshal([]byte(input), &nestedMap)
+_ = json.Unmarshal([]byte(input), &nestedMap)
 
-nestedMap.GetValue("[A][B][C][D]")
-// Output: value
+fmt.Println(nestedMap.GetValue("[A][B][C][D]"))
 
-nestedMap.SetValue("[A][B][C][E]", "OK") // OK
+fmt.Println(nestedMap.SetValue("[A][B][C][E]", "OK"))
+
+serialized, _ := json.Marshal(nestedMap.Data)
+fmt.Println(string(serialized))
+// Output:
+// value
+// true
+// {"A":{"B":{"C":{"D":"value","E":"OK"}}}}
 ```

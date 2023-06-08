@@ -58,3 +58,30 @@ func Example() {
 	// Value at path [A][B][C][E][XX][X]: xyz
 	// Serialized JSON: {"A":{"B":{"C":{"D":"old_value","E":{"XX":{"X":"xyz","Y":"abc"}}}}}}
 }
+
+func ExampleInReadme() {
+	input := `
+	{
+		"A": {
+			"B": {
+				"C": {
+					"D": "value"
+				}
+			}
+		}
+	}`
+
+	var nestedMap NestedMap
+	_ = json.Unmarshal([]byte(input), &nestedMap)
+
+	fmt.Println(nestedMap.GetValue("[A][B][C][D]"))
+
+	fmt.Println(nestedMap.SetValue("[A][B][C][E]", "OK"))
+
+	serialized, _ := json.Marshal(nestedMap.Data)
+	fmt.Println(string(serialized))
+	// Output:
+	// value
+	// true
+	// {"A":{"B":{"C":{"D":"value","E":"OK"}}}}
+}

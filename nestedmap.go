@@ -79,13 +79,14 @@ func (n *NestedMap) GetValue(path string) interface{} {
 
 // SetValue sets the value at the specified path in the NestedMap.
 // It will create new NestedMaps along the path if they don't exist.
-func (n *NestedMap) SetValue(path string, value interface{}) {
+// The function returns true if the value is set successfully, false otherwise.
+func (n *NestedMap) SetValue(path string, value interface{}) bool {
 	keys := parsePath(path)
 	if keys == nil {
-		return
+		return false
 	}
 
-	n.setValueHelper(keys, 0, value)
+	return n.setValueHelper(keys, 0, value)
 }
 
 // getValueHelper is a helper function to search for the value at the specified path.
@@ -111,25 +112,26 @@ func (n *NestedMap) getValueHelper(keys []string, index int) (interface{}, bool)
 }
 
 // setValueHelper is a helper function to set the value at the specified path.
-func (n *NestedMap) setValueHelper(keys []string, index int, value interface{}) {
+// It returns true if the value is set successfully, false otherwise.
+func (n *NestedMap) setValueHelper(keys []string, index int, value interface{}) bool {
 	if index >= len(keys) {
-		return
+		return false
 	}
 
 	if index == len(keys)-1 {
 		n.Data[keys[index]] = value
-		return
+		return true
 	}
 
 	if currentValue, ok := n.Data[keys[index]].(*NestedMap); ok {
-		currentValue.setValueHelper(keys, index+1, value)
-	} else {
-		newMap := &NestedMap{
-			Data: make(map[string]interface{}),
-		}
-		n.Data[keys[index]] = newMap
-		newMap.setValueHelper(keys, index+1, value)
+		return currentValue.setValueHelper(keys, index+1, value)
 	}
+
+	newMap := &NestedMap{
+		Data: make(map[string]interface{}),
+	}
+	n.Data[keys[index]] = newMap
+	return newMap.setValueHelper(keys, index+1, value)
 }
 
 var pathRE = regexp.MustCompile(`\[(.+?)\]`)
