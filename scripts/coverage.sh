@@ -9,15 +9,15 @@ if (( $(echo "$COVERAGE <= 50" | bc -l) )) ; then
 fi
 curl "https://img.shields.io/badge/coverage-$COVERAGE%25-$COLOR" > .github/badge.svg
 
-git add badge.svg
-git commit -m "added badge"
-git push 
-
-git fetch
-git checkout badge -f
-git pull
-git merge origin/main  
-curl "https://img.shields.io/badge/coverage-$COVERAGE%25-$COLOR" > .github/badge.svg
-git add .
-git commit -m "added badge"
+git add .github/badge.svg
+git commit -m "feat: added badge"
 git push
+
+# git fetch
+# git checkout badge -f
+# git pull
+# git merge origin/main  
+# curl "https://img.shields.io/badge/coverage-$COVERAGE%25-$COLOR" > .github/badge.svg
+# git add .
+# git commit -m "feat: added badge"
+# git push

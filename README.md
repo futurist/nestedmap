@@ -3,7 +3,7 @@
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/futurist/nestedmap)](https://pkg.go.dev/github.com/futurist/nestedmap)
 [![Build Status](https://github.com/futurist/nestedmap/workflows/CI/badge.svg)](https://github.com/futurist/nestedmap/actions?query=workflow%3ACI)
 [![Go Report Card](https://goreportcard.com/badge/github.com/futurist/nestedmap)](https://goreportcard.com/report/github.com/futurist/nestedmap)
-![Coverage](https://github.com/futurist/nestedmap/blob/main/.github/badge.svg?branch=badge)
+![Coverage](https://github.com/futurist/nestedmap/blob/main/.github/badge.svg)
 
 golang data structure for manipulating and representing JSON objects with deeply nested map support.
 
