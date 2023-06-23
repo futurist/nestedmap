@@ -51,6 +51,15 @@ jobs:
           go test -race -vet=off ./...  -covermode=atomic -coverprofile=coverage.out
           go tool cover -func=coverage.out -o=coverage.out
 
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+          env: CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./covprofile.out
+          flags: unittests
+          name: codecov-umbrella
+
   test-cache:
     runs-on: ubuntu-latest
     steps:
